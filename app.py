@@ -43,12 +43,12 @@ def processRequest(req):
 
 
 def makeYqlQuery(req):
-    entryNum = req.get("entryNum")
-    atype = result.get("type")
+    entryNum = req.get("result").get("parameters").get("entryNum")
+    atype = req.get("result").get("parameters").get("type")
     if type is None:
         return None
 
-    return entryNum + "/" + atype
+    return atype + "/" + entryNum
 
 
 def makeWebhookResult(data):
