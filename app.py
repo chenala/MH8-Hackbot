@@ -29,13 +29,13 @@ def webhook():
 
 
 def processRequest(req):
-    if req.get("result").get("action") != "yahooWeatherForecast":
+    if req.get("result").get("action") != "pullData":
         return {}
-    baseurl = "https://query.yahooapis.com/v1/public/yql?"
+    baseurl = "https://jsonplaceholder.typicode.com/"
     yql_query = makeYqlQuery(req)
     if yql_query is None:
         return {}
-    yql_url = baseurl + urllib.urlencode({'q': yql_query}) + "&format=json"
+    yql_url = baseurl + yql_query
     result = urllib.urlopen(yql_url).read()
     data = json.loads(result)
     res = makeWebhookResult(data)
@@ -43,42 +43,24 @@ def processRequest(req):
 
 
 def makeYqlQuery(req):
-    result = req.get("result")
-    parameters = result.get("parameters")
-    city = parameters.get("geo-city")
-    if city is None:
+    entryNum = req.get("entryNum")
+    atype = result.get("type")
+    if type is None:
         return None
 
-    return "select * from weather.forecast where woeid in (select woeid from geo.places(1) where text='" + city + "')"
+    return entryNum + "/" + atype
 
 
 def makeWebhookResult(data):
-    query = data.get('query')
-    if query is None:
+    albumId = data.get('albumId')
+    if title is None:
         return {}
-
-    result = query.get('results')
-    if result is None:
+    title = data.get('title')
+    if title is None:
         return {}
-
-    channel = result.get('channel')
-    if channel is None:
-        return {}
-
-    item = channel.get('item')
-    location = channel.get('location')
-    units = channel.get('units')
-    if (location is None) or (item is None) or (units is None):
-        return {}
-
-    condition = item.get('condition')
-    if condition is None:
-        return {}
-
     # print(json.dumps(item, indent=4))
 
-    speech = "Today in " + location.get('city') + ": " + condition.get('text') + \
-             ", the temperature is " + condition.get('temp') + " " + units.get('temperature')
+    speech = "The albumId is " + albumId + " and it has the title " + title
 
     print("Response:")
     print(speech)
@@ -88,7 +70,7 @@ def makeWebhookResult(data):
         "displayText": speech,
         # "data": data,
         # "contextOut": [],
-        "source": "apiai-weather-webhook-sample"
+        "source": "MH8-Hackbot"
     }
 
 
